@@ -33,9 +33,14 @@ def get_rates():
     global _memory_cache
 
     now = datetime.now()
+    mock_mode = _is_mock_mode()
 
-    if _is_mock_mode():
+    print(f'USE_MOCK_API={os.getenv("USE_MOCK_API", "true")} mock mode:', mock_mode)
+
+    if mock_mode:
         return _mock_fallback_response(now, 'mock api enabled')
+
+    print('USE_MOCK_API=false: live Alpha Vantage API path is enabled.')
 
     if _memory_cache and not _is_expired(_memory_cache, now):
         return _public_response(_memory_cache)
@@ -95,6 +100,8 @@ def _fetch_alpha_vantage_rates(fetched_at):
     if not api_key:
         raise ExchangeRateError('api key missing')
 
+    print('Starting live Alpha Vantage requests.')
+
     rates = []
     last_updated_values = []
 
@@ -126,6 +133,8 @@ def _fetch_alpha_vantage_rates(fetched_at):
 
 
 def _request_pair(client, api_key, base, target):
+    print(f'Calling Alpha Vantage for {base}/{target}.')
+
     try:
         response = client.get(
             ALPHA_VANTAGE_URL,
@@ -153,6 +162,10 @@ def _request_pair(client, api_key, base, target):
 
     print(f'Alpha Vantage top-level keys for {base}/{target}:', list(data.keys()))
 
+    if 'Realtime Currency Exchange Rate' in data:
+        print(f'Alpha Vantage realtime data found for {base}/{target}.')
+        return data
+
     # Rate limit or usage guidance responses arrive with HTTP 200.
     if 'Note' in data or 'Information' in data:
         raise ExchangeRateError('rate limit')
@@ -160,7 +173,10 @@ def _request_pair(client, api_key, base, target):
     if 'Error Message' in data:
         raise ExchangeRateError('parse error')
 
-    return data
+    raise ExchangeRateError(
+        'parse error',
+        f'Unexpected Alpha Vantage response structure for {base}/{target}.',
+    )
 
 
 def _parse_rate(pair, base, target, rate_data):

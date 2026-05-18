@@ -11,18 +11,20 @@ function RateTable({ rates }) {
           <thead>
             <tr>
               <th>통화쌍</th>
-              <th>기준</th>
-              <th>대상</th>
-              <th>환율</th>
+              <th>기준 환율</th>
+              <th>매수 환율</th>
+              <th>매도 환율</th>
+              <th>스프레드</th>
             </tr>
           </thead>
           <tbody>
             {rates.map((rate) => (
               <tr key={rate.pair}>
                 <td>{rate.pair}</td>
-                <td>{rate.base}</td>
-                <td>{rate.target}</td>
-                <td>{formatRate(rate.rate)}</td>
+                <td>{formatRate(rate.rate, rate.pair)}</td>
+                <td>{formatOptionalRate(rate.bid, rate.pair)}</td>
+                <td>{formatOptionalRate(rate.ask, rate.pair)}</td>
+                <td>{formatOptionalRate(Number(rate.ask) - Number(rate.bid), rate.pair)}</td>
               </tr>
             ))}
           </tbody>
@@ -32,9 +34,14 @@ function RateTable({ rates }) {
   )
 }
 
-function formatRate(value) {
+function formatOptionalRate(value, pair) {
+  return Number.isFinite(Number(value)) ? formatRate(Number(value), pair) : '-'
+}
+
+function formatRate(value, pair) {
   return new Intl.NumberFormat('ko-KR', {
-    maximumFractionDigits: 4,
+    minimumFractionDigits: pair === 'JPY/KRW' ? 4 : 2,
+    maximumFractionDigits: pair === 'JPY/KRW' ? 4 : 2,
   }).format(value)
 }
 
