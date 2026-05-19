@@ -240,6 +240,17 @@
   white-space: nowrap;
 }
 
+.rate-summary {
+  display: grid;
+  gap: 6px;
+}
+
+.rate-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .quote-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

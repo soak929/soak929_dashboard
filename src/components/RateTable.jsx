@@ -3,21 +3,21 @@ function RateTable({ rates }) {
     <section className="panel table-panel">
       <div className="section-title table-title">
         <div>
-          <p className="eyebrow">Markets</p>
+          <p className="eyebrow">환율 시장</p>
           <h2>환율 상세 표</h2>
         </div>
-        <span className="badge">{rates.length} pairs</span>
+        <span className="badge">{rates.length}개 통화쌍</span>
       </div>
 
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Pair</th>
-              <th>Rate</th>
-              <th>Bid</th>
-              <th>Ask</th>
-              <th>Spread</th>
+              <th>통화쌍</th>
+              <th>기준 환율</th>
+              <th>매수 환율</th>
+              <th>매도 환율</th>
+              <th>차이</th>
             </tr>
           </thead>
           <tbody>

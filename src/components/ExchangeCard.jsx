@@ -7,25 +7,28 @@ function ExchangeCard({ rate, statusLabel }) {
         <div>
           <p className="pair-label">{rate.pair}</p>
           <span className="pair-subtitle">
-            {rate.base} to {rate.target}
+            {rate.base} / {rate.target}
           </span>
         </div>
         <span className="badge badge-soft">{statusLabel}</span>
       </div>
 
-      <strong className="rate-value">{formatRate(rate.rate, rate.pair)}</strong>
+      <div className="rate-summary">
+        <span className="rate-label">기준 환율</span>
+        <strong className="rate-value">{formatRate(rate.rate, rate.pair)}</strong>
+      </div>
 
       <dl className="quote-list">
         <div>
-          <dt>Bid</dt>
+          <dt>매수 환율</dt>
           <dd className="numeric positive-text">{formatOptionalRate(rate.bid, rate.pair)}</dd>
         </div>
         <div>
-          <dt>Ask</dt>
+          <dt>매도 환율</dt>
           <dd className="numeric negative-text">{formatOptionalRate(rate.ask, rate.pair)}</dd>
         </div>
         <div>
-          <dt>Spread</dt>
+          <dt>매수·매도 차이</dt>
           <dd className="numeric muted-number">{formatOptionalRate(spread, rate.pair)}</dd>
         </div>
       </dl>
