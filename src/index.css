@@ -1,7 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
 :root {
-  --text: #3e4651;
-  --bg: #f5f7fa;
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --bg: #0b0e11;
+  --surface: #1e2329;
+  --surface-elevated: #2b3139;
+  --border: #2b3139;
+  --primary: #fcd535;
+  --primary-active: #f0b90b;
+  --primary-text: #181a20;
+  --text: #eaecef;
+  --muted: #707a8a;
+  --muted-strong: #929aa5;
+  --up: #0ecb81;
+  --down: #f6465d;
+  --sans: 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas,
+    'Liberation Mono', monospace;
 
   font: 16px/1.5 var(--sans);
   color: var(--text);
@@ -16,9 +30,17 @@
   box-sizing: border-box;
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
   min-width: 320px;
+  min-height: 100svh;
   margin: 0;
+  background: var(--bg);
+  font-family: 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
 }
 
 button,
@@ -27,12 +49,18 @@ select {
   font-family: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
 #root {
   min-height: 100svh;
 }
 
 h1,
 h2,
-p {
+p,
+dl,
+dd {
   margin-top: 0;
 }

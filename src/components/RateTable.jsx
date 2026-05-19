@@ -1,30 +1,40 @@
 function RateTable({ rates }) {
   return (
     <section className="panel table-panel">
-      <div className="section-title">
-        <p className="eyebrow">Rates</p>
-        <h2>환율 목록</h2>
+      <div className="section-title table-title">
+        <div>
+          <p className="eyebrow">Markets</p>
+          <h2>환율 상세 표</h2>
+        </div>
+        <span className="badge">{rates.length} pairs</span>
       </div>
 
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>통화쌍</th>
-              <th>기준 환율</th>
-              <th>매수 환율</th>
-              <th>매도 환율</th>
-              <th>스프레드</th>
+              <th>Pair</th>
+              <th>Rate</th>
+              <th>Bid</th>
+              <th>Ask</th>
+              <th>Spread</th>
             </tr>
           </thead>
           <tbody>
             {rates.map((rate) => (
               <tr key={rate.pair}>
-                <td>{rate.pair}</td>
-                <td>{formatRate(rate.rate, rate.pair)}</td>
-                <td>{formatOptionalRate(rate.bid, rate.pair)}</td>
-                <td>{formatOptionalRate(rate.ask, rate.pair)}</td>
-                <td>{formatOptionalRate(Number(rate.ask) - Number(rate.bid), rate.pair)}</td>
+                <td>
+                  <strong>{rate.pair}</strong>
+                  <span>
+                    {rate.base}/{rate.target}
+                  </span>
+                </td>
+                <td className="numeric">{formatRate(rate.rate, rate.pair)}</td>
+                <td className="numeric positive-text">{formatOptionalRate(rate.bid, rate.pair)}</td>
+                <td className="numeric negative-text">{formatOptionalRate(rate.ask, rate.pair)}</td>
+                <td className="numeric muted-number">
+                  {formatOptionalRate(Number(rate.ask) - Number(rate.bid), rate.pair)}
+                </td>
               </tr>
             ))}
           </tbody>

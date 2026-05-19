@@ -16,7 +16,7 @@ function CurrencyConverter({ rates }) {
     <section className="panel converter-panel">
       <div className="section-title">
         <p className="eyebrow">Converter</p>
-        <h2>통화 변환</h2>
+        <h2>통화 변환기</h2>
       </div>
 
       <div className="form-grid">
@@ -30,40 +30,43 @@ function CurrencyConverter({ rates }) {
           />
         </label>
 
-        <label>
-          기준 통화
-          <select
-            value={fromCurrency}
-            onChange={(event) => setFromCurrency(event.target.value)}
-          >
-            {currencies.map((currency) => (
-              <option key={currency} value={currency}>
-                {currency}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="converter-row">
+          <label>
+            From
+            <select
+              value={fromCurrency}
+              onChange={(event) => setFromCurrency(event.target.value)}
+            >
+              {currencies.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label>
-          대상 통화
-          <select
-            value={toCurrency}
-            onChange={(event) => setToCurrency(event.target.value)}
-          >
-            {currencies.map((currency) => (
-              <option key={currency} value={currency}>
-                {currency}
-              </option>
-            ))}
-          </select>
-        </label>
+          <label>
+            To
+            <select
+              value={toCurrency}
+              onChange={(event) => setToCurrency(event.target.value)}
+            >
+              {currencies.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
 
       <div className="conversion-result" aria-live="polite">
         <span>환산 결과</span>
-        <strong>
-          {formatCurrency(convertedAmount)} {toCurrency}
-        </strong>
+        <div className="conversion-value">
+          <strong className="numeric conversion-amount">{formatCurrency(convertedAmount)}</strong>
+          <span className="conversion-currency">{toCurrency}</span>
+        </div>
       </div>
     </section>
   )
