@@ -43,12 +43,12 @@ def get_rates():
     print('USE_MOCK_API=false: live Alpha Vantage API path is enabled.')
 
     if _memory_cache and not _is_expired(_memory_cache, now):
-        return _cached_public_response(_memory_cache)
+        return _cache_hit_response(_memory_cache)
 
     file_cache = _load_file_cache()
     if file_cache and not _is_expired(file_cache, now):
         _memory_cache = file_cache
-        return _cached_public_response(file_cache)
+        return _cache_hit_response(file_cache)
 
     try:
         response = _fetch_alpha_vantage_rates(now)
@@ -60,7 +60,7 @@ def get_rates():
 
         last_success_cache = _memory_cache or file_cache
         if last_success_cache:
-            return _cached_public_response(last_success_cache)
+            return _cache_fallback_response(last_success_cache, error.fallback_reason)
 
         return _mock_fallback_response(now, error.fallback_reason)
     except Exception as error:
@@ -69,13 +69,13 @@ def get_rates():
 
         last_success_cache = _memory_cache or file_cache
         if last_success_cache:
-            return _cached_public_response(last_success_cache)
+            return _cache_fallback_response(last_success_cache, 'network error')
 
         return _mock_fallback_response(now, 'network error')
 
 
 def _is_mock_mode():
-    return os.getenv('USE_MOCK_API', 'true').lower() == 'true'
+    return os.getenv('USE_MOCK_API', 'false').lower() == 'true'
 
 
 def _fetch_alpha_vantage_rates(fetched_at):
@@ -274,12 +274,21 @@ def _public_response(cache, source=None, is_fallback=None, fallback_reason=None)
     }
 
 
-def _cached_public_response(cache):
+def _cache_hit_response(cache):
+    return _public_response(
+        cache,
+        source='Alpha Vantage cache',
+        is_fallback=False,
+        fallback_reason=None,
+    )
+
+
+def _cache_fallback_response(cache, fallback_reason):
     return _public_response(
         cache,
         source='Alpha Vantage cache',
         is_fallback=True,
-        fallback_reason='using cached data',
+        fallback_reason=fallback_reason,
     )
 
 
