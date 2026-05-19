@@ -35,7 +35,7 @@ def get_rates():
     now = datetime.now()
     mock_mode = _is_mock_mode()
 
-    print(f'USE_MOCK_API={os.getenv("USE_MOCK_API", "true")} mock mode:', mock_mode)
+    print('USE_MOCK_API mock mode:', mock_mode)
 
     if mock_mode:
         return _mock_fallback_response(now, 'mock api enabled')
@@ -43,17 +43,12 @@ def get_rates():
     print('USE_MOCK_API=false: live Alpha Vantage API path is enabled.')
 
     if _memory_cache and not _is_expired(_memory_cache, now):
-        return _public_response(_memory_cache)
+        return _cached_public_response(_memory_cache)
 
     file_cache = _load_file_cache()
     if file_cache and not _is_expired(file_cache, now):
-        _memory_cache = _with_response_metadata(
-            file_cache,
-            source='Alpha Vantage cache',
-            is_fallback=False,
-            fallback_reason='using file cache',
-        )
-        return _public_response(_memory_cache)
+        _memory_cache = file_cache
+        return _cached_public_response(file_cache)
 
     try:
         response = _fetch_alpha_vantage_rates(now)
@@ -65,12 +60,7 @@ def get_rates():
 
         last_success_cache = _memory_cache or file_cache
         if last_success_cache:
-            return _public_response(
-                last_success_cache,
-                source='Alpha Vantage cache',
-                is_fallback=True,
-                fallback_reason=error.fallback_reason,
-            )
+            return _cached_public_response(last_success_cache)
 
         return _mock_fallback_response(now, error.fallback_reason)
     except Exception as error:
@@ -79,12 +69,7 @@ def get_rates():
 
         last_success_cache = _memory_cache or file_cache
         if last_success_cache:
-            return _public_response(
-                last_success_cache,
-                source='Alpha Vantage cache',
-                is_fallback=True,
-                fallback_reason='network error',
-            )
+            return _cached_public_response(last_success_cache)
 
         return _mock_fallback_response(now, 'network error')
 
@@ -238,6 +223,10 @@ def _load_file_cache():
 
 
 def _save_file_cache(response):
+    if response.get('source') != 'Alpha Vantage' or response.get('isFallback') is not False:
+        print('Skipping cache save because response is not a live Alpha Vantage success.')
+        return
+
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         with CACHE_FILE.open('w', encoding='utf-8') as cache_file:
@@ -256,7 +245,12 @@ def _is_valid_cache(cache):
         'cacheExpiresAt',
         'rates',
     }
-    return required_keys.issubset(cache) and isinstance(cache['rates'], list)
+    return (
+        required_keys.issubset(cache)
+        and cache['source'] == 'Alpha Vantage'
+        and cache['isFallback'] is False
+        and isinstance(cache['rates'], list)
+    )
 
 
 def _is_expired(cache, now):
@@ -280,12 +274,13 @@ def _public_response(cache, source=None, is_fallback=None, fallback_reason=None)
     }
 
 
-def _with_response_metadata(cache, source, is_fallback, fallback_reason):
-    response = deepcopy(cache)
-    response['source'] = source
-    response['isFallback'] = is_fallback
-    response['fallbackReason'] = fallback_reason
-    return response
+def _cached_public_response(cache):
+    return _public_response(
+        cache,
+        source='Alpha Vantage cache',
+        is_fallback=True,
+        fallback_reason='using cached data',
+    )
 
 
 def _mock_fallback_response(now, fallback_reason):
